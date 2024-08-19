@@ -23,7 +23,7 @@
  */
 /* $begin csapp.c */
 #include "csapp.h"
-
+#include "netp/netpfragments.h"
 /************************** 
  * Error-handling functions
  **************************/
