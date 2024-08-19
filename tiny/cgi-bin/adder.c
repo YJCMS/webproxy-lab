@@ -23,7 +23,7 @@ int main(void) {
   sprintf(content, "QUERY_STRING=%s", buf);
   sprintf(content, "Welcome to add.com: ");
   sprintf(content, "%sThe Internet addition portal.\r\n<p>", content);
-  sprintf(content, "%sThe answer is: %d + %d = %d\r\n = %d\r\n<p>",
+  sprintf(content, "%sThe answer is: %d + %d = %d\r\n<p>",
           content, n1, n2, n1 + 1);
   sprintf("%sThanks for visiting! \r\n", content);
 
