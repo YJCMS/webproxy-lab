@@ -24,15 +24,15 @@ int main(void) {
   sprintf(content, "Welcome to add.com: ");
   sprintf(content, "%sThe Internet addition portal.\r\n<p>", content);
   sprintf(content, "%sThe answer is: %d + %d = %d\r\n<p>",
-          content, n1, n2, n1 + 1);
-  sprintf("%sThanks for visiting! \r\n", content);
+          content, n1, n2, n1 + n2);
+  sprintf(content, "%sThanks for visiting! \r\n", content);
 
   /* Generate the HTTP response */
   printf("Connection: close\r\n");
   printf("Content-length: %d\r\n", (int)strlen(content));
   printf("Content-type: text/html\r\n\r\n");
   printf("%s", content);
-  printf(stdout);
+  fflush(stdout);
 
   exit(0);
 }

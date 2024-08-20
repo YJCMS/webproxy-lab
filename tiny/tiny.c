@@ -82,7 +82,7 @@ void doit(int fd) {
 
   } else { /* Server dynamic content */
       if(!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) { // 파일이 실행가능하진 검증
-        clienterror(fd, filename, "403", "Forbiden",
+        clienterror(fd, filename, "403", "Forbidden",
                      "Tiny couldn't run the CGI program");
         return;
       }
@@ -130,7 +130,7 @@ int parse_uri(char *uri, char *filename, char *cgiargs) {
     strcpy(cgiargs, "");
     strcpy(filename, ".");
     strcat(filename, uri);
-    if(uri[strlen(uri)-1] = '/') {
+    if(uri[strlen(uri)-1] == '/') {
       strcat(filename, "home.html");
     }
     return 1;
@@ -146,7 +146,7 @@ int parse_uri(char *uri, char *filename, char *cgiargs) {
     }
 
     strcpy(filename, ".");
-    strcpy(filename, uri);
+    strcat(filename, uri);
     return 0;
   }
 }
@@ -204,5 +204,5 @@ void serve_dynamic(int fd, char *filename, char *cgiargs) {
     Dup2(fd, STDOUT_FILENO); // Redirect stdout to client
     Execve(filename, emptylist, environ); // Run CGI program
   }
-  wait(NULL); // parent wait for and reaps child
+  Wait(NULL); // parent wait for and reaps child
 }
