@@ -5,7 +5,7 @@ int main(int argc, char **argv) {
     char *host, *port, buf[MAXLINE]; // 서버의 호스트명, 포트번호, 입출력 버퍼
     rio_t rio; // RIO 구조체, 버퍼링된 I/O를 위한 데이터 구조
 
-    // 명령행 인수가 올바르게 제공되지 않은 경우 출력 후 종료
+    // 명령행 인수가 올바르게 제공되지 않은 경우 사용법 안내 출력 후 종료
     if (argc != 3) {
         fprintf(stderr, "usage: %s <host> <port>\n", argv[0]);
         exit(0);
@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
     // 서버에 연결하기 위한 클라이언트 소켓을 생성(호스트와 포트로 서버연결)
     clientfd = Open_clientfd(host, port);
-    // 클라이언트 소켓을 RIO 구조체로 초기화(버퍼링된 I/O를 사용하기 위해
+    // 클라이언트 소켓을 RIO 구조체로 초기화(버퍼링된 I/O를 사용하기 위해)
     Rio_readinitb(&rio, clientfd);
 
     // 표준입력으로부터 데이터를 읽어 서버에 전송하고, 서버로부터 응답을 출력
