@@ -167,11 +167,14 @@ void serve_static(int fd, char *filename, int filesize) {
   printf("%s", buf);
 
   /* Send respense body to client */
-  srcfd = Open(filename, O_RDONLY, 0);
-  srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
+  srcfd = Open(filename, O_RDONLY, 0); // O_RDONLY 읽기 권한으로 filename을 불러옴
+  srcp = (char *)Malloc(filesize); //  문제 11.9 - malloc 이용 
+  // srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0); // 기존 코드 - 파일의 메모리 그대로 가상메모리 매핑
+  Rio_readn(srcfd, srcp, filesize); // 문제 11.9 - 파일의 데이터를 메모리로 읽어와서 srcp에 매핑
   Close(srcfd);
-  Rio_writen(fd, srcp, filesize);
-  Munmap(srcp, filesize);
+  Rio_writen(fd, srcp, filesize); // 해당 메모리에 있는 파일 내용을 fd로 보냄
+  // Munmap(srcp, filesize); // 기존 코드 - Munmap으로 메모리 해제
+  free(srcp); // 문제 11.9 - malloc 사용 -> free 필수
 }
 
 /* get_filetype - Derive file type from filename */
