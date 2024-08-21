@@ -11,7 +11,7 @@
 void doit(int fd);
 void read_requesthdrs(rio_t *rp);
 int parse_uri(char *uri, char *filename, char *cgiargs);
-void serve_static(int fd, char *filename, int filesize);
+void serve_static(int fd, char *filename, int filesize, char *method);
 void get_filetype(char *filename, char *filetype);
 void serve_dynamic(int fd, char *filename, char *cgiargs);
 void clienterror(int fd, char *cause, char *errnum, char *shortmsg,
@@ -56,7 +56,7 @@ void doit(int fd) {
   printf("Request headers:\n");
   printf("%s", buf);
   sscanf(buf, "%s %s %s", method, uri, version);
-  if (strcasecmp(method, "GET")) { // GET 요청이 아니면 에러 메세지(stcasecmp 함수 문자열 비교해서 같으면 0 리턴)
+  if (strcasecmp(method, "GET") * strcasecmp(method, "HEAD")) { // GET / HEAD 요청이 아니면 에러 메세지(stcasecmp 함수 문자열 비교해서 같으면 0 리턴)
     clienterror(fd, method, "501", "Not Implemented",
                   "Tiny does not implement this method");
     return;
@@ -78,7 +78,7 @@ void doit(int fd) {
       return;
     }
 
-    serve_static(fd, filename, sbuf.st_size); // 정적 컨텐츠 클라이언트에게 제공
+    serve_static(fd, filename, sbuf.st_size, method); // 정적 컨텐츠 클라이언트에게 제공
 
   } else { /* Server dynamic content */
       if(!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) { // 파일이 실행가능하진 검증
@@ -151,20 +151,27 @@ int parse_uri(char *uri, char *filename, char *cgiargs) {
   }
 }
 
-void serve_static(int fd, char *filename, int filesize) {
+void serve_static(int fd, char *filename, int filesize, char *method) {
   int srcfd;
   char *srcp, filetype[MAXLINE], buf[MAXBUF];
 
   /* Send response headers to client */
   get_filetype(filename, filetype);
   sprintf(buf, "HTTP/1.0 200 OK\r\n");
-  sprintf(buf,"%sSever: Tiny Web Server\r\n", buf);
+  // 응답 헤더
+  sprintf(buf, "%sSever: Tiny Web Server\r\n", buf);
   sprintf(buf, "%sConnection: close\r\n", buf);
   sprintf(buf, "%sContent-length: %d\r\n", buf, filesize);
   sprintf(buf, "%sContent-type: %s\r\n\r\n", buf, filetype);
+  // 응답을 클라이언트에 보냄
   Rio_writen(fd, buf, strlen(buf));
   printf("Response header:\n");
   printf("%s", buf);
+
+  // HTTP HEAD
+  if (strcasecmp(method, "HEAD") == 0) {
+      return;
+  } 
 
   /* Send respense body to client */
   srcfd = Open(filename, O_RDONLY, 0); // O_RDONLY 읽기 권한으로 filename을 불러옴
@@ -175,6 +182,7 @@ void serve_static(int fd, char *filename, int filesize) {
   Rio_writen(fd, srcp, filesize); // 해당 메모리에 있는 파일 내용을 fd로 보냄
   // Munmap(srcp, filesize); // 기존 코드 - Munmap으로 메모리 해제
   free(srcp); // 문제 11.9 - malloc 사용 -> free 필수
+
 }
 
 /* get_filetype - Derive file type from filename */
