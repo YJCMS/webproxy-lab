@@ -13,18 +13,23 @@ int main(void) {
   if ((buf = getenv("QUERY_STRING")) != NULL) {
     p = strchr(buf, '&');
     *p = '\0';
-    strcpy(arg1, buf);
-    strcpy(arg2, p+1);
-    n1 = atoi(arg1);
-    n2 = atoi(arg2);
+
+    /* 원래 코드 */
+    // strcpy(arg1, buf);
+    // strcpy(arg2, p+1);
+    // n1 = atoi(arg1);
+    // n2 = atoi(arg2);
+
+    /* 11.10 문제 */
+    sscanf(buf, "num1=%d", &n1); // buf에서 %d를 읽어서 n1 저장
+    sscanf(p + 1, "num2=%d", &n2); // p + 1은 num2 의미
   }
 
   /* Make the response body */
   sprintf(content, "QUERY_STRING=%s", buf);
   sprintf(content, "Welcome to add.com: ");
   sprintf(content, "%sThe Internet addition portal.\r\n<p>", content);
-  sprintf(content, "%sThe answer is: %d + %d = %d\r\n<p>",
-          content, n1, n2, n1 + n2);
+  sprintf(content, "%sThe answer is: %d + %d = %d\r\n<p>", content, n1, n2, n1 + n2);
   sprintf(content, "%sThanks for visiting! \r\n", content);
 
   /* Generate the HTTP response */
